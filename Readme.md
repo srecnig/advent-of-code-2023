@@ -1,3 +1,5 @@
-== 🟥 advent of code 🟩
+![example workflow](https://github.com/srecnig/advent-of-code-2023/actions/workflows/ci.yml/badge.svg) ![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)(https://github.com/rubocop/rubocop)
+
+## 🟥 advent of code 2023 🟩
 
 it's been a while since i wrote a lot of ruby. so let's try this again.
