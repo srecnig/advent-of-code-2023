@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CubeConundrum
   class Bag
     attr_reader :red, :green, :blue
@@ -16,11 +18,9 @@ module CubeConundrum
     end
 
     def valid?(game)
-      if game.red <= @red && game.green <= @green && game.blue <= @blue
-        return true
-      else
-        return false
-      end
+      return true if game.red <= @red && game.green <= @green && game.blue <= @blue
+
+      false
     end
 
     def all_valid?(games)
@@ -28,7 +28,7 @@ module CubeConundrum
     end
 
     def power
-      @red * @green * @blue 
+      @red * @green * @blue
     end
   end
 
@@ -36,17 +36,17 @@ module CubeConundrum
     attr_reader :id, :red, :green, :blue
 
     def self.parse(string)
-      id = string.split(':')[0].split(' ')[1] .to_i
+      id = string.split(':')[0].split(' ')[1].to_i
       game_strings = string.split(':')[1].strip.split(';').map(&:strip)
       games = []
-      for game_string in game_strings do
+      game_strings.each do |game_string|
         red_match = game_string.match(/\s*(\d+)\sred/)
         green_match = game_string.match(/\s*(\d+)\sgreen/)
         blue_match = game_string.match(/\s*(\d+)\sblue/)
         red = (red_match && red_match.captures[0].to_i) || 0
         green = (green_match && green_match.captures[0].to_i) || 0
         blue = (blue_match && blue_match.captures[0].to_i) || 0
-        game = Game.new(id: id, red: red, green: green, blue: blue)
+        game = Game.new(id:, red:, green:, blue:)
         games << game
       end
       games

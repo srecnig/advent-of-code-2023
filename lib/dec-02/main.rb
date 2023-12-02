@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './cube_conundrum'
 
 def main1(filepath)
@@ -5,7 +7,7 @@ def main1(filepath)
   result = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true).inject(0) do |memo, string|
     games = CubeConundrum::Game.parse(string)
     all_valid = bag.all_valid?(games)
-    memo = all_valid ? memo + games[0].id : memo 
+    all_valid ? memo + games[0].id : memo
   end
   p result
 end
@@ -18,7 +20,6 @@ def main2(filepath)
   end
   p result
 end
-
 
 main1('input.txt')
 main2('input.txt')

@@ -1,7 +1,9 @@
-require "minitest/test_task"
+# frozen_string_literal: true
+
+require 'minitest/test_task'
 
 Minitest::TestTask.create
-task :default => :test
+task default: :test
 
 task :run do
   ruby 'lib/dec-02/main.rb'
