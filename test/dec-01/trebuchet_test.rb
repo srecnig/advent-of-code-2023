@@ -17,17 +17,15 @@ class ExtractNumber < Minitest::Test
     assert_equal 33, extract_number('a3b')
     assert_nil extract_number('abcdefg')
   end
-end
 
-
-class DigitizeWords < Minitest::Test
-  def test_digitize_words
-      assert_equal '219', digitize_string('two1nine')
-      assert_equal '8wo3', digitize_string('eightwothree')
-      assert_equal 'abc123xyz', digitize_string('abcone2threexyz')
-      assert_equal 'x2ne34', digitize_string('xtwone3four')
-      assert_equal '49872', digitize_string('4nineeightseven2')
-      assert_equal 'z1ight234', digitize_string('zoneight234')
-      assert_equal '7pqrst6teen', digitize_string('7pqrstsixteen')
+  def test_digitize
+      assert_equal 29, extract_number('two1nine', digitize: true)
+      assert_equal 83, extract_number('eightwothree', digitize: true)
+      assert_equal 13, extract_number('abcone2threexyz', digitize: true)
+      assert_equal 24, extract_number('xtwone3four', digitize: true)
+      assert_equal 42, extract_number('4nineeightseven2', digitize: true)
+      assert_equal 14, extract_number('zoneight234', digitize: true)
+      assert_equal 76, extract_number('7pqrstsixteen', digitize: true)
+      assert_equal 82, extract_number('eightwo', digitize: true)
   end
 end
