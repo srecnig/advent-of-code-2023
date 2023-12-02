@@ -1,9 +1,8 @@
-task default: %w[test]
+require "minitest/test_task"
+
+Minitest::TestTask.create
+task :default => :test
 
 task :run do
-  ruby 'lib/dec-01/trebuchet.rb'
-end
-
-task :test do
-  ruby 'test/dec-01/trebuchet_test.rb'
+  ruby 'lib/dec-02/main.rb'
 end
