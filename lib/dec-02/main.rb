@@ -1,7 +1,7 @@
 require_relative './cube_conundrum'
 
 def main1(filepath)
-  bag = CubeConundrum::Bag.new(red=12, green=13, blue=14)
+  bag = CubeConundrum::Bag.new(red: 12, green: 13, blue: 14)
   result = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true).inject(0) do |memo, string|
     games = CubeConundrum::Game.parse(string)
     all_valid = bag.all_valid?(games)
