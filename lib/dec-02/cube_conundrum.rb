@@ -1,18 +1,22 @@
 module CubeConundrum
   class Bag
-      def initialize(red, green, blue)
-        @red = red
-        @green = green
-        @blue = blue
-      end
+    def initialize(red, green, blue)
+      @red = red
+      @green = green
+      @blue = blue
+    end
 
-      def valid?(game)
-        if game.red <= @red && game.green <= @green && game.blue <= @blue
-          return true
-        else
-          return false
-        end
+    def valid?(game)
+      if game.red <= @red && game.green <= @green && game.blue <= @blue
+        return true
+      else
+        return false
       end
+    end
+
+    def all_valid?(games)
+      games.all? { |game| valid?(game) }
+    end
   end
 
   class Game

@@ -35,4 +35,12 @@ class CubeConundrumTest < Minitest::Test
         assert_equal 3, games[2].green
         assert_equal 15, games[2].blue
     end
+
+    def test_all_valid
+        bag = CubeConundrum::Bag.new(red=2, blue=2, green=2)
+        game1 = CubeConundrum::Game.new(id=1, red=3, blue=3, green=3)
+        game2 = CubeConundrum::Game.new(id=1, red=2, blue=2, green=2)
+        assert_equal false, bag.all_valid?([game1, game2])
+        assert_equal true, bag.all_valid?([game2, game2])
+    end
 end
