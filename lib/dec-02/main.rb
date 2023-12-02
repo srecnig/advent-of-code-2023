@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './cube_conundrum'
+require_relative 'cube_conundrum'
 
 def main1(filepath)
   bag = CubeConundrum::Bag.new(red: 12, green: 13, blue: 14)

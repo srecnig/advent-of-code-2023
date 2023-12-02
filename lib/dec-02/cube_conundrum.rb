@@ -36,7 +36,7 @@ module CubeConundrum
     attr_reader :id, :red, :green, :blue
 
     def self.parse(string)
-      id = string.split(':')[0].split(' ')[1].to_i
+      id = string.split(':')[0].split[1].to_i
       game_strings = string.split(':')[1].strip.split(';').map(&:strip)
       games = []
       game_strings.each do |game_string|
