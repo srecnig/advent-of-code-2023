@@ -1,5 +1,14 @@
 module CubeConundrum
   class Bag
+    attr_reader :red, :green, :blue
+
+    def self.minimum_bag(games)
+      max_red = games.max_by(&:red).red
+      max_blue = games.max_by(&:blue).blue
+      max_green = games.max_by(&:green).green
+      Bag.new(red=max_red, green=max_green, blue=max_blue)
+    end
+
     def initialize(red, green, blue)
       @red = red
       @green = green
@@ -16,6 +25,10 @@ module CubeConundrum
 
     def all_valid?(games)
       games.all? { |game| valid?(game) }
+    end
+
+    def power()
+      @red * @green * @blue 
     end
   end
 
