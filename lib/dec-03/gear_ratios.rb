@@ -4,7 +4,7 @@ module GearRatios
   Coordinate = Struct.new(:x, :y)
 
   class Schematic
-    attr_reader :part_numbers
+    attr_reader :part_numbers, :gear_ratios
 
     def initialize(rows)
       column_count = rows[0].length
@@ -26,11 +26,8 @@ module GearRatios
       filter_number_points!
       convert_to_numbers!
       # gear ratios
-      # find '*'
-      # check if there are exactly 2 neighbours that are numbers
-      # find the number_points for the coordinates
-      # convert into numbers and multiply
-      # set gear_ratios
+      collect_gear_number_points!
+      convert_to_gear_ratios!
     end
 
     def at(coordinate)
@@ -98,6 +95,44 @@ module GearRatios
       end
     end
 
+    def collect_gear_number_points!
+      @gear_number_points = []
+      @points.each do |row|
+        row.each do |point|
+          next unless point.is_gear_symbol
+
+          number_neighbours = point.neighbours(zero: @zero, max: @max).map do |coordinate|
+            at(coordinate)
+          end.filter(&:is_number)
+
+          p point
+          p number_neighbours.length
+
+          @gear_number_points << number_neighbours if number_neighbours.length == 2
+        end
+      end
+    end
+
+    def convert_to_gear_ratios!
+      @gear_ratios = []
+      # find the @gear_number_points (single points) in the global list of @number_points (list of points forming
+      # a number). luckily we already needed this list in part 1, so we can just re-use it, even though this is not
+      # super nice
+      p @gear_number_points
+
+      @gear_number_points.each do |gear_number_point_pair|
+        point1 = gear_number_point_pair[0]
+        number_points_list1 = @number_points.find { |number_point_list| number_point_list.any? { |np| np == point1 } }
+        gear1_value = number_points_list1.map(&:char).join.to_i
+
+        point2 = gear_number_point_pair[1]
+        number_points_list2 = @number_points.find { |number_point_list| number_point_list.any? { |np| np == point2 } }
+        gear2_value = number_points_list2.map(&:char).join.to_i
+
+        @gear_ratios << (gear1_value * gear2_value)
+      end
+    end
+
     def draw
       @points.each do |row|
         puts row.map(&:debug_char).join
@@ -122,22 +157,20 @@ module GearRatios
     end
 
     def apply_logic!
+      @is_number = false
+      @is_symbol = false
+      @is_gear_symbol = false
+      @is_blank = false
+      @logical_char = ''
+
       if @char == '.'
-        @is_number = false
-        @is_symbol = false
-        @is_gear_symbol = false
         @is_blank = true
         @logical_char = '.'
       elsif @char.match(/\d/)
         @is_number = true
-        @is_symbol = false
-        @is_gear_symbol = false
-        @is_blank = false
         @logical_char = 'N'
       else
-        @is_number = false
         @is_symbol = true
-        @is_blank = false
         if @char == '*'
           @is_gear_symbol = true
           @logical_char = 'G'

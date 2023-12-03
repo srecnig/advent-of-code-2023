@@ -7,7 +7,7 @@ require_relative '../../lib/dec-03/gear_ratios'
 class GearRatiosTest < Minitest::Test
   include GearRatios
 
-  def test_initalization
+  def test_part_numbers_initalization
     schematic = Schematic.new(
       [
         '...4',
@@ -36,6 +36,19 @@ class GearRatiosTest < Minitest::Test
     assert_equal false, schematic.at(Coordinate.new(3, 4)).is_adjacent # 5
     # numbers
     assert_equal [4, 12, 8], schematic.part_numbers
+  end
+
+  def test_gear_ratios_initalization
+    schematic = Schematic.new(
+      [
+        '...4',
+        '.12*',
+        'b6.$',
+        '.7..',
+        '8*5.'
+      ]
+    )
+    assert_equal [48], schematic.gear_ratios
   end
 
   def test_apply_logic
