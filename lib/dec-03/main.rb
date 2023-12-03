@@ -7,7 +7,7 @@ def main1(filename)
   schematic = GearRatios::Schematic.new(schematic_data)
   schematic.draw
   p schematic.part_numbers.inject(&:+)
-  p schematic.gear_ratios #.inject(&:+)
+  p schematic.gear_ratios.inject(&:+)
 end
 
-main1('input1.txt')
+main1('input.txt')

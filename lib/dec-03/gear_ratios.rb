@@ -104,11 +104,7 @@ module GearRatios
           number_neighbours = point.neighbours(zero: @zero, max: @max).map do |coordinate|
             at(coordinate)
           end.filter(&:is_number)
-
-          p point
-          p number_neighbours.length
-
-          @gear_number_points << number_neighbours if number_neighbours.length == 2
+          @gear_number_points << number_neighbours
         end
       end
     end
@@ -118,17 +114,24 @@ module GearRatios
       # find the @gear_number_points (single points) in the global list of @number_points (list of points forming
       # a number). luckily we already needed this list in part 1, so we can just re-use it, even though this is not
       # super nice
-      p @gear_number_points
 
-      @gear_number_points.each do |gear_number_point_pair|
-        point1 = gear_number_point_pair[0]
-        number_points_list1 = @number_points.find { |number_point_list| number_point_list.any? { |np| np == point1 } }
-        gear1_value = number_points_list1.map(&:char).join.to_i
+      @gear_number_points.each do |gear_number_point_list|
+        number_points_list = []
+        gear_number_point_list.each do |gear_number_point|
+          number_points_list << @number_points.find do |number_point_list|
+            number_point_list.any? do |np|
+              np == gear_number_point
+            end
+          end
+        end
+        # potentially, we had multiple individual digits of the same number bordering the gear. but list in
+        # @number_points are the same, object-wise, so uniq should be able to filter out duplicates. after this
+        # we can check if the gear connects _exactly_ 2 numbers
+        number_points_list = number_points_list.uniq
+        next unless number_points_list.length == 2
 
-        point2 = gear_number_point_pair[1]
-        number_points_list2 = @number_points.find { |number_point_list| number_point_list.any? { |np| np == point2 } }
-        gear2_value = number_points_list2.map(&:char).join.to_i
-
+        gear1_value = number_points_list[0].map(&:char).join.to_i
+        gear2_value = number_points_list[1].map(&:char).join.to_i
         @gear_ratios << (gear1_value * gear2_value)
       end
     end
