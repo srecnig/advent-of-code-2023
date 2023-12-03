@@ -13,14 +13,29 @@ class GearRatiosTest < Minitest::Test
         '...4',
         '12.$',
         'b..$',
-        '...5',
-        '1@..'
+        '....',
+        '8@.5'
       ]
     )
-    assert_equal '.', schematic.at(0, 0).char
-    assert_equal '4', schematic.at(3, 0).char
-    assert_equal '1', schematic.at(0, 4).char
-    assert_equal '.', schematic.at(3, 4).char
+    # init
+    assert_equal '.', schematic.at(Coordinate.new(0, 0)).char
+    assert_equal '4', schematic.at(Coordinate.new(3, 0)).char
+    assert_equal '8', schematic.at(Coordinate.new(0, 4)).char
+    assert_equal '5', schematic.at(Coordinate.new(3, 4)).char
+    # logic
+    assert_equal true, schematic.at(Coordinate.new(0, 0)).is_blank
+    assert_equal true, schematic.at(Coordinate.new(3, 0)).is_number
+    assert_equal true, schematic.at(Coordinate.new(0, 1)).is_number
+    assert_equal true, schematic.at(Coordinate.new(1, 1)).is_number
+    assert_equal true, schematic.at(Coordinate.new(0, 2)).is_symbol
+    # adjadency
+    assert_equal true, schematic.at(Coordinate.new(3, 0)).is_adjacent # 4
+    assert_equal true, schematic.at(Coordinate.new(0, 1)).is_adjacent # 1
+    assert_equal true, schematic.at(Coordinate.new(1, 1)).is_adjacent # 2
+    assert_equal true, schematic.at(Coordinate.new(0, 4)).is_adjacent # 8
+    assert_equal false, schematic.at(Coordinate.new(3, 4)).is_adjacent # 5
+    # numbers
+    assert_equal [4, 12, 8], schematic.numbers
   end
 
   def test_apply_logic

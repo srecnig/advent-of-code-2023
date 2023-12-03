@@ -4,10 +4,14 @@ module GearRatios
   Coordinate = Struct.new(:x, :y)
 
   class Schematic
+    attr_reader :part_numbers
+
     def initialize(rows)
-      @column_count = rows[0].length
-      @row_count = rows.length
-      @points = Array.new(@row_count) { Array.new(@column_count) }
+      column_count = rows[0].length
+      row_count = rows.length
+      @zero = Coordinate.new(0, 0)
+      @max = Coordinate.new(column_count - 1, row_count - 1)
+      @points = Array.new(row_count) { Array.new(column_count) }
       rows.each_with_index do |row, y_index|
         row.each_char.with_index do |char_, x_index|
           @points[y_index][x_index] = Point.new(
@@ -16,10 +20,14 @@ module GearRatios
         end
       end
       build_logical_map!
+      build_adjacents!
+      collect_number_points!
+      filter_number_points!
+      convert_to_numbers!
     end
 
-    def at(x, y)
-      @points[y][x]
+    def at(coordinate)
+      @points[coordinate.y][coordinate.x]
     end
 
     def build_logical_map!
@@ -28,9 +36,64 @@ module GearRatios
       end
     end
 
+    def build_adjacents!
+      @points.each do |row|
+        row.each do |point|
+          next unless point.is_number
+
+          is_adjacent = point.neighbours(zero: @zero, max: @max).any? do |coordinate|
+            at(coordinate).is_symbol
+          end
+          point.is_adjacent = is_adjacent
+        end
+      end
+    end
+
+    def collect_number_points!
+      @number_points = []
+      @points.each do |row|
+        new_number_points = []
+        row.each do |point|
+          if point.is_number
+            # create new_number_points or add to existing
+            if new_number_points.empty?
+              new_number_points = [point]
+            else
+              new_number_points << point
+            end
+          else
+            # skip if no current new_number_points
+            next if new_number_points.empty?
+
+            # or close existing one
+            @number_points << new_number_points
+            new_number_points = []
+          end
+        end
+        unless new_number_points.empty?
+          # there's still an open new_number_points, close it.
+          @number_points << new_number_points
+        end
+      end
+    end
+
+    def filter_number_points!
+      @number_points = @number_points.filter do |number_point_list|
+        number_point_list.any?(&:is_adjacent)
+      end
+    end
+
+    def convert_to_numbers!
+      @part_numbers = []
+      @number_points.each do |number_point_list|
+        number = number_point_list.map(&:char).join.to_i
+        @part_numbers << number
+      end
+    end
+
     def draw
       @points.each do |row|
-        puts row.map(&:logical_char).join
+        puts row.map(&:debug_char).join
       end
     end
   end
@@ -43,6 +106,12 @@ module GearRatios
       @x = coordinate.x
       @y = coordinate.y
       @char = char
+    end
+
+    def debug_char
+      return 'A' if @is_adjacent
+
+      @logical_char
     end
 
     def apply_logic!
