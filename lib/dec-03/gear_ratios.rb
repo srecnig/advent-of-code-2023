@@ -21,9 +21,16 @@ module GearRatios
       end
       build_logical_map!
       build_adjacents!
+      # part numbers
       collect_number_points!
       filter_number_points!
       convert_to_numbers!
+      # gear ratios
+      # find '*'
+      # check if there are exactly 2 neighbours that are numbers
+      # find the number_points for the coordinates
+      # convert into numbers and multiply
+      # set gear_ratios
     end
 
     def at(coordinate)
@@ -99,7 +106,7 @@ module GearRatios
   end
 
   class Point
-    attr_accessor :is_number, :is_symbol, :is_blank, :is_adjacent
+    attr_accessor :is_number, :is_symbol, :is_gear_symbol, :is_blank, :is_adjacent
     attr_reader :x, :y, :char, :logical_char
 
     def initialize(coordinate, char:)
@@ -118,18 +125,26 @@ module GearRatios
       if @char == '.'
         @is_number = false
         @is_symbol = false
+        @is_gear_symbol = false
         @is_blank = true
         @logical_char = '.'
       elsif @char.match(/\d/)
         @is_number = true
         @is_symbol = false
+        @is_gear_symbol = false
         @is_blank = false
         @logical_char = 'N'
       else
         @is_number = false
         @is_symbol = true
         @is_blank = false
-        @logical_char = 'X'
+        if @char == '*'
+          @is_gear_symbol = true
+          @logical_char = 'G'
+        else
+          @is_gear_symbol = false
+          @logical_char = 'X'
+        end
       end
     end
 

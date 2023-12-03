@@ -35,7 +35,7 @@ class GearRatiosTest < Minitest::Test
     assert_equal true, schematic.at(Coordinate.new(0, 4)).is_adjacent # 8
     assert_equal false, schematic.at(Coordinate.new(3, 4)).is_adjacent # 5
     # numbers
-    assert_equal [4, 12, 8], schematic.numbers
+    assert_equal [4, 12, 8], schematic.part_numbers
   end
 
   def test_apply_logic
@@ -43,6 +43,7 @@ class GearRatiosTest < Minitest::Test
     number_point.apply_logic!
     assert_equal true, number_point.is_number
     assert_equal false, number_point.is_symbol
+    assert_equal false, number_point.is_gear_symbol
     assert_equal false, number_point.is_blank
     assert_equal 'N', number_point.logical_char
 
@@ -50,6 +51,7 @@ class GearRatiosTest < Minitest::Test
     blank_point.apply_logic!
     assert_equal false, blank_point.is_number
     assert_equal false, blank_point.is_symbol
+    assert_equal false, blank_point.is_gear_symbol
     assert_equal true, blank_point.is_blank
     assert_equal '.', blank_point.logical_char
 
@@ -57,8 +59,17 @@ class GearRatiosTest < Minitest::Test
     symbol_point.apply_logic!
     assert_equal false, symbol_point.is_number
     assert_equal true, symbol_point.is_symbol
+    assert_equal false, symbol_point.is_gear_symbol
     assert_equal false, symbol_point.is_blank
     assert_equal 'X', symbol_point.logical_char
+
+    symbol_point = Point.new(Coordinate.new(0, 0), char: '*')
+    symbol_point.apply_logic!
+    assert_equal false, symbol_point.is_number
+    assert_equal true, symbol_point.is_symbol
+    assert_equal true, symbol_point.is_gear_symbol
+    assert_equal false, symbol_point.is_blank
+    assert_equal 'G', symbol_point.logical_char
   end
 
   def test_neighbours
