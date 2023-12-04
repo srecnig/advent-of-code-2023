@@ -7,7 +7,7 @@ Minitest::TestTask.create
 task default: %i[lint test]
 
 task :run do
-  ruby 'lib/dec-03/main.rb'
+  ruby 'lib/dec-04/main.rb'
 end
 
 RuboCop::RakeTask.new(:lint) do |task|
