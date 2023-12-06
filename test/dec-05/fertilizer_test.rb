@@ -47,17 +47,20 @@ class FertilizerTest < Minitest::Test
   def test_ranged_alamanc_lookup_works
     almanac_map = RangedAlmanacMap.new(source: :seed, destination: :soil, range_strings: ['50 98 2', '52 50 48'])
     # the input range is outside the range, so it doesn't change
-    assert_equal 0...10, almanac_map[0...10]
-    assert_equal 100...110, almanac_map[100...110]
+    assert_equal [0...10], almanac_map[0...10]
+    assert_equal [100...110], almanac_map[100...110]
 
     # the input range is completely in one range
-    assert_equal 62...72, almanac_map[60...70]
-    assert_equal 50...52, almanac_map[98...100]
+    assert_equal [62...72], almanac_map[60...70]
+    assert_equal [50...52], almanac_map[98...100]
 
     # the input range is partially in ranges, we need to split up
+    # before transformation: [60...98, 98...100, 100...110] # 100...110last TBD
+    assert_equal [62...100, 50...52], almanac_map[60...110]
+
     # the input range would need to be split up into multiple rages. unclear if this is needed.
     # assert_raises(RuntimeError) do
-    #   almanac_map[60...110]
+    #
     # end
   end
 
@@ -88,11 +91,10 @@ class FertilizerTest < Minitest::Test
   def test_ranged_alamanc_range_transform_input
     range = RangedAlamancRange.new(50...100, 1030...1080)
     assert_equal 1030...1040, range.transform_input(50...60)
-
-    # when do we raise an error?!
-    # assert_raises(RuntimeError) do
-    #   AlmanacMap.new(source: :seed, destination: :soil, range_strings: ['50 98 2', '52 50 0'])
-    # end
+    assert_equal 1030...1080, range.transform_input(50...100)
+    assert_raises(RuntimeError) do
+      range.transform_input(50...200)
+    end
   end
 
   def test_initialize_almanac_works

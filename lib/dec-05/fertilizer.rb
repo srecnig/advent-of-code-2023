@@ -46,6 +46,8 @@ module Fertilizer
     def transform_input(input_range)
       position_in_range = input_range.begin - @source_range.begin
       destination_start = @destination_range.begin + position_in_range
+      raise 'input_range too big' if destination_start + input_range.size > @destination_range.end
+
       destination_start...destination_start + input_range.size
     end
   end
@@ -73,23 +75,29 @@ module Fertilizer
 
     def [](input_range)
       if input_range.end <= @lower_bound || input_range.begin >= @upper_bound
-        # if it's outside the ranges of this map we're done.
-        input_range
+        # if it's outside the ranges of this map we're done. this is :not_at_all, but more efficient, because
+        # we know the max/min values of all ranges already.
+        [input_range]
       elsif @ranges.any? { |r| r.source_contains?(input_range) == :completely }
         # if it's completely contained in one range, we can just add the offset
         containing_range = @ranges.find { |r| r.source_contains?(input_range) == :completely }
-        containing_range.transform_input(input_range)
-        # destination_range = containing_range.destination_range
-        # position_in_range = input_range.begin - containing_range.source_range.begin
-        # destination_start = destination_range.begin + position_in_range
-        # destination_start...destination_start + input_range.size
+        [containing_range.transform_input(input_range)]
       else
-        # if it's partially contained in one range, we need to split it up
-
-        # first, get the ranges that contain the input range
-        @ranges.reject { |r| r.source_contains?(input_range) == :not_at_all }
-
-        raise 'Do we need this?'
+        # first, get the ranges that contain the input range and split up the input range
+        connected_ranges = @ranges.select { |r| r.source_contains?(input_range) == :partially }
+        connected_ranges.map do |range|
+          # first one
+          if range.source_range.begin <= input_range.begin
+            split_input_range = input_range.begin...range.source_range.end
+          elsif range.source_range.begin >= input_range.begin && range.source_range.end <= input_range.end
+            split_input_range = range.source_range.begin...range.source_range.end
+          elsif range.source_range.end >= input_range.end
+            split_input_range = range.source_range.begin...input_range.end
+          else
+            raise 'This should not happen'
+          end
+          range.transform_input(split_input_range)
+        end
       end
     end
   end
