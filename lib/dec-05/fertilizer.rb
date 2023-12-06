@@ -92,7 +92,7 @@ module Fertilizer
         end
 
         @ranges.select { |r| r.source_contains?(input_range) == :partially }.each do |range|
-          # first one
+          # we go from left to right
           if range.source_range.begin <= input_range.begin
             split_input_range = input_range.begin...range.source_range.end
           elsif range.source_range.begin >= input_range.begin && range.source_range.end <= input_range.end
