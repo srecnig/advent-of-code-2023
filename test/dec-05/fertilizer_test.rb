@@ -55,26 +55,9 @@ class FertilizerTest < Minitest::Test
     assert_equal [50...52], almanac_map[98...100]
 
     # the input range is partially in ranges, we need to split up
-    # before transformation: [60...98, 98...100, 100...110] # 100...110last TBD
-    assert_equal [62...100, 50...52], almanac_map[60...110]
-
-    # the input range would need to be split up into multiple rages. unclear if this is needed.
-    # assert_raises(RuntimeError) do
-    #
-    # end
+    # before transformation: [0...60, 50...98, 98...100, 100...110]
+    assert_equal [0...50, 52...100, 50...52, 100...110], almanac_map[0...110]
   end
-
-  # def source_contains?(input_range)
-  #   if @source_range.include?(input_range.begin) && @source_range.include?(input_range.end - 1)
-  #     :completely
-  #   elsif @source_range.include?(input_range.begin) || @source_range.include?(input_range.end - 1)
-  #     :partially
-  #   elsif @source_range.begin >= input_range.begin && @source_range.end <= input_range.end
-  #     :is_contained_in
-  #   else
-  #     :not_at_all
-  #   end
-  # end
 
   def test_ranged_alamanc_range
     range = RangedAlamancRange.new(50...100, 1000...1050)

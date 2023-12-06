@@ -83,9 +83,13 @@ module Fertilizer
         containing_range = @ranges.find { |r| r.source_contains?(input_range) == :completely }
         [containing_range.transform_input(input_range)]
       else
-        # first, get the ranges that contain the input range and split up the input range
-        connected_ranges = @ranges.select { |r| r.source_contains?(input_range) == :partially }
-        connected_ranges.map do |range|
+        transformed_split_ranges = []
+
+        if input_range.begin < ranges[0].source_range.begin
+          transformed_split_ranges << (input_range.begin...ranges[0].source_range.begin)
+        end
+
+        @ranges.select { |r| r.source_contains?(input_range) == :partially }.each do |range|
           # first one
           if range.source_range.begin <= input_range.begin
             split_input_range = input_range.begin...range.source_range.end
@@ -96,8 +100,14 @@ module Fertilizer
           else
             raise 'This should not happen'
           end
-          range.transform_input(split_input_range)
+          transformed_split_ranges << range.transform_input(split_input_range)
         end
+
+        if input_range.end > ranges[-1].source_range.end
+          # right outside @ranges, already transformed
+          transformed_split_ranges << (ranges[-1].source_range.end...input_range.end)
+        end
+        transformed_split_ranges
       end
     end
   end
