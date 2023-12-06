@@ -32,6 +32,21 @@ class FertilizerTest < Minitest::Test
     assert_equal 52, almanac.maps[1].ranges[2].source_range.begin
   end
 
+  def test_lookup_ranged_almanac_works
+    almanac_string = %(seeds: 79 14 55 13
+
+    seed-to-soil map:
+    50 98 2
+    52 50 48
+
+    soil-to-fertilizer map:
+    0 15 37
+    37 52 2
+    39 0 15)
+    almanac = RangedAlmanac.new(almanac_string)
+    assert_equal [81...95, 57...70], almanac.lookup
+  end
+
   def test_initialize_ranged_alamanc_map_works
     almanac_map = RangedAlmanacMap.new(source: :seed, destination: :soil, range_strings: ['50 98 2', '52 50 48'])
     assert_equal 50, almanac_map.ranges[0].source_range.begin
@@ -44,7 +59,7 @@ class FertilizerTest < Minitest::Test
     assert_equal 52, almanac_map.ranges[1].destination_range.end
   end
 
-  def test_ranged_alamanc_lookup_works
+  def test_ranged_alamanc_map_lookup_works
     almanac_map = RangedAlmanacMap.new(source: :seed, destination: :soil, range_strings: ['50 98 2', '52 50 48'])
     # the input range is outside the range, so it doesn't change
     assert_equal [0...10], almanac_map[0...10]

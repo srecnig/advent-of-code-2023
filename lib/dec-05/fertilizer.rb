@@ -18,9 +18,8 @@ module Fertilizer
     end
 
     def lookup
-      @seeds.map do |seed|
-        # every seed is now a range
-        @maps.inject(seed) { |lookup, map| map[lookup] }
+      @maps.inject(@seeds) do |seeds, map_|
+        seeds.map { |s| map_[s] }.flatten
       end
     end
   end
@@ -83,9 +82,12 @@ module Fertilizer
         containing_range = @ranges.find { |r| r.source_contains?(input_range) == :completely }
         [containing_range.transform_input(input_range)]
       else
+        # we need to split up the input_range into multiple new ranges, because it exists across
+        # more than one of @ranges
         transformed_split_ranges = []
 
         if input_range.begin < ranges[0].source_range.begin
+          # left outside @ranges, so it's already transformed
           transformed_split_ranges << (input_range.begin...ranges[0].source_range.begin)
         end
 
