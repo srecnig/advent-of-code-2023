@@ -9,9 +9,10 @@ def main1(filepath)
 end
 
 def main2(filepath)
-  lines = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
-  p lines
+  almanac_content = File.read(File.join(File.dirname(__FILE__), filepath))
+  almanac = Fertilizer::RangedAlmanac.new(almanac_content)
+  p almanac.lookup
 end
 
-main1('input.txt')
-# main2('input1.txt')
+# main1('input.txt')
+main2('input1.txt')
