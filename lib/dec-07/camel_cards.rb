@@ -84,4 +84,65 @@ module CamelCards
       @value.hash
     end
   end
+
+  class InterestingHand < Hand
+    # rubocop:disable Lint/MissingSuper
+    def initialize(hand)
+      @hand = hand
+      @cards = hand.each_char.map { |rank| InterestingCard.new(rank) }
+    end
+    # rubocop:enable Lint/MissingSuper
+
+    def hand_type
+      hand_type_without_jokers = super()
+      return hand_type_without_jokers if @cards.none?(&:joker?)
+
+      joker_count = @cards.select(&:joker?).count
+      jokerize_hand(hand_type_without_jokers, joker_count)
+    end
+
+    def jokerize_hand(hand_type, joker_count)
+      case hand_type
+      when :five_of_a_kind, :four_of_a_kind, :full_house
+        :five_of_a_kind # JJJJJ or QQQQJ, JJJJK or 444JJ, JJJ44
+      when :three_of_a_kind
+        :four_of_a_kind # JJJ78, # 777JK
+      when :two_pair
+        if joker_count == 1
+          :full_house # 33JQQ
+        else
+          :four_of_a_kind # 33JJQ
+        end
+      when :one_pair
+        :three_of_a_kind # A3JQK
+      when :highcard
+        :one_pair
+      end
+    end
+  end
+
+  class InterestingCard < Card
+    def self.get_value(rank)
+      rank_mapping = {
+        J: 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        T: 10,
+        Q: 12,
+        K: 13,
+        A: 14
+      }
+      rank_mapping[rank]
+    end
+
+    def joker?
+      @rank == 'J'
+    end
+  end
 end
