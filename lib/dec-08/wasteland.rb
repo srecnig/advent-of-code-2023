@@ -2,6 +2,7 @@
 
 module Wasteland
   Node = Struct.new(:address, :left, :right)
+  TraversalNode = Struct.new(:node, :done)
 
   class NodeMap
     attr_reader :nodes, :instructions
@@ -16,8 +17,8 @@ module Wasteland
       @nodes = node_list.to_h
     end
 
-    def next_step(position)
-      @nodes[position].send(@instructions.next)
+    def next_step(position, instruction)
+      @nodes[position].send(instruction)
     end
 
     def traverse!(start = :AAA)
@@ -25,10 +26,29 @@ module Wasteland
       steps_taken = 0
 
       loop do
-        position = self[next_step(position)].address
+        next_instruction = @instructions.next
+        position = self[next_step(position, next_instruction)].address
         steps_taken += 1
         break if position == :ZZZ
       end
+      steps_taken
+    end
+
+    def traverse_multiple!
+      start_nodes = @nodes.select { |address, _node| address.to_s.end_with?('A') }.values
+      traversal_nodes = start_nodes.map { |node| TraversalNode.new(node, false) }
+      steps_taken = 0
+
+      loop do
+        next_instruction = @instructions.next
+        steps_taken += 1
+        traversal_nodes.each do |tn|
+          tn.node = self[next_step(tn.node.address, next_instruction)]
+          tn.done = tn.node.address.to_s.end_with?('Z')
+        end
+        break if traversal_nodes.all?(&:done)
+      end
+
       steps_taken
     end
 
