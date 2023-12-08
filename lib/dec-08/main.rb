@@ -14,5 +14,5 @@ def main2(filepath)
   p node_map.traverse_multiple!
 end
 
-# main1('input.txt')
+main1('input.txt')
 main2('input.txt')
