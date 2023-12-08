@@ -53,7 +53,8 @@ module Wasteland
         end
         break if traversal_nodes.all?(&:done)
       end
-      # we're lucky that all end_steps are a multiple of the # of total instructions.
+      # we're lucky that all end_steps are exact multiples of the # of total instructions and not
+      # a single endpoint is reached without one full cycle of instructions.
       traversal_nodes.reduce(1) { |r, node| r.lcm(node.end_step) }
     end
 
