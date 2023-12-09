@@ -6,8 +6,7 @@ module Mirage
 
     def initialize(history_string)
       @values = history_string.split.map(&:to_i)
-      @expanded = [@values]
-      expand!
+      @expanded = expand([@values])
       predict!
       redict!
     end
@@ -16,14 +15,12 @@ module Mirage
       row.each_cons(2).map { |a, b| b - a }
     end
 
-    def expand!
-      @expanded = [@values]
-      row = @values
-      loop do
-        row = next_row(row)
-        @expanded << row
-        break if row.all?(&:zero?)
-      end
+    def expand(rows)
+      row = next_row(rows[-1])
+      rows << row
+      return rows if row.all?(&:zero?)
+
+      expand rows
     end
 
     def predict!
