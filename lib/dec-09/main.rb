@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
-require_relative 'something'
+require_relative 'mirage'
 
 def main1(filepath)
-  something = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
-  p something
+  lines = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
+  result1 = lines.inject(0) do |sum, line|
+    sum + Mirage::History.new(line).predicted[0][-1]
+  end
+  p result1
+  result2 = lines.inject(0) do |sum, line|
+    sum + Mirage::History.new(line).redicted[0][0]
+  end
+  p result2
 end
 
-def main2(filepath)
-  something = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
-  p something
-end
-
-main1('input1.txt')
-# main2('input1.txt')
+main1('input.txt')
