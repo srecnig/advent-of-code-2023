@@ -4,7 +4,7 @@ module PipeMaze
   Coordinate = Struct.new(:x, :y)
 
   class PipeMap
-    attr_reader :start
+    attr_reader :start, :path
 
     def initialize(lines)
       # read and create all the lines
@@ -30,21 +30,25 @@ module PipeMaze
       @points[coordinate.y][coordinate.x]
     end
 
-    def follow_start
+    def follow_start!
       potentially_connected_points = @start.connects_to.map { |c| self[c] }
       connected_points = potentially_connected_points.select { |p| p.connects?(@start) }
+      @path = explore_route(start_point: connected_points[0], end_point: @start)
+      @path.each { |point| point.in_path = true }
 
-      if connected_points.length == 2
-        explore_route(start_point: connected_points[0], end_point: @start)
-      else
-        # S is ambigous. we need to follow every potential path, but return as
-        # soon as we found one
-        connected_points.each do |start_point|
-          steps = explore_route(start_point:, end_point: @start)
-          next if steps.nil?
-
-          return steps
-        end
+      case connected_points.map(&:coordinate)
+      when [@start.north, @start.south]
+        @start.logical_char = '|'
+      when [@start.east, @start.west]
+        @start.logical_char = '-'
+      when [@start.north, @start.east]
+        @start.logical_char = 'L'
+      when [@start.north, @start.west]
+        @start.logical_char = 'J'
+      when [@start.south, @start.west]
+        @start.logical_char = '7'
+      when [@start.east, @start.south]
+        @start.logical_char = 'F'
       end
     end
 
@@ -70,10 +74,13 @@ module PipeMaze
 
   class Point
     attr_reader :char, :coordinate
+    attr_accessor :in_path, :logical_char
 
     def initialize(char, coordinate, max_coordinates)
       @char = char
+      @logical_char = char
       @coordinate = coordinate
+      @in_path = false
       @zero = max_coordinates[0]
       @max = max_coordinates[1]
     end
@@ -96,7 +103,7 @@ module PipeMaze
 
     def connects_to
       connecting = []
-      case @char
+      case @logical_char
       when '|'
         connecting = [north, south]
       when '-'

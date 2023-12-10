@@ -42,7 +42,14 @@ class PipeMazeTest < Minitest::Test
       'L|-JF'
     ]
     pipe_map = PipeMap.new(lines)
-    assert_equal ['-', '7', '|', 'J', '-', 'L', '|', 'S'], pipe_map.follow_start.map(&:char)
+    pipe_map.follow_start!
+    assert_equal 'F', pipe_map.start.logical_char
+    assert_equal ['-', '7', '|', 'J', '-', 'L', '|', 'S'], pipe_map.path.map(&:char)
+    assert_equal true, pipe_map[Coordinate.new(3, 1)].in_path
+    assert_equal true, pipe_map[Coordinate.new(2, 1)].in_path
+    assert_equal false, pipe_map[Coordinate.new(0, 1)].in_path
+    assert_equal false, pipe_map[Coordinate.new(0, 2)].in_path
+    assert_equal false, pipe_map[Coordinate.new(2, 2)].in_path
 
     lines = [
       '..F7.',
@@ -52,8 +59,10 @@ class PipeMazeTest < Minitest::Test
       'LJ...'
     ]
     pipe_map = PipeMap.new(lines)
+    pipe_map.follow_start!
     steps = ['J', 'F', 'J', 'F', '7', '|', 'L', '7', 'J', '-', '-', 'F', 'J', 'L', '|', 'S']
-    assert_equal steps, pipe_map.follow_start.map(&:char)
+    assert_equal 'F', pipe_map.start.logical_char
+    assert_equal steps, pipe_map.path.map(&:char)
   end
 
   def test_point_char
