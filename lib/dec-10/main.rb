@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'something'
+require_relative 'pipe_maze'
 
 def main1(filepath)
   something = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
