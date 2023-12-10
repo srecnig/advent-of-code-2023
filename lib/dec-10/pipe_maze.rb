@@ -29,13 +29,50 @@ module PipeMaze
     def [](coordinate)
       @points[coordinate.y][coordinate.x]
     end
+
+    def follow_start
+      potentially_connected_points = @start.connects_to.map { |c| self[c] }
+      connected_points = potentially_connected_points.select { |p| p.connects?(@start) }
+
+      if connected_points.length == 2
+        explore_route(start_point: connected_points[0], end_point: @start)
+      else
+        # S is ambigous. we need to follow every potential path, but return as
+        # soon as we found one
+        connected_points.each do |start_point|
+          steps = explore_route(start_point:, end_point: @start)
+          next if steps.nil?
+
+          return steps
+        end
+      end
+    end
+
+    def explore_route(start_point:, end_point:)
+      steps = []
+      last_point = end_point
+      current_point = start_point
+      loop do
+        steps << current_point
+        next_coordinate = current_point.connects_to.reject { |c| c == last_point.coordinate }.first
+        # if nil, there's no next coordinate, we're in a dead end.
+        return if next_coordinate.nil?
+        # if we're at the actual end
+        break if next_coordinate == end_point.coordinate
+
+        last_point = current_point
+        current_point = self[next_coordinate]
+      end
+      steps << end_point
+      steps
+    end
   end
 
   class Point
-    attr_reader :symbol, :coordinate
+    attr_reader :char, :coordinate
 
-    def initialize(symbol, coordinate, max_coordinates)
-      @symbol = symbol
+    def initialize(char, coordinate, max_coordinates)
+      @char = char
       @coordinate = coordinate
       @zero = max_coordinates[0]
       @max = max_coordinates[1]
@@ -59,7 +96,7 @@ module PipeMaze
 
     def connects_to
       connecting = []
-      case @symbol
+      case @char
       when '|'
         connecting = [north, south]
       when '-'
@@ -72,22 +109,24 @@ module PipeMaze
         connecting = [south, west]
       when 'F'
         connecting = [east, south]
-      when '.', 'S'
+      when 'S'
+        connecting = [north, east, south, west]
+      when '.'
         []
       end
       connecting.filter { |n| n.x >= @zero.x && n.y >= @zero.y && n.x <= @max.x && n.y <= @max.y }
     end
 
-    def connects?(_coordinate)
-      connects_to.include?
+    def connects?(point)
+      connects_to.include?(point.coordinate)
     end
 
     def blank?
-      @symbol == '.'
+      @char == '.'
     end
 
     def start?
-      @symbol == 'S'
+      @char == 'S'
     end
   end
 end
