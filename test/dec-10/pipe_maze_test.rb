@@ -65,6 +65,24 @@ class PipeMazeTest < Minitest::Test
     assert_equal steps, pipe_map.path.map(&:char)
   end
 
+  def test_can_count_inside_points
+    lines = [
+      '..........',
+      '.S------7.',
+      '.|F----7|.',
+      '.||....||.',
+      '.||....||.',
+      '.|L-7F-J|.',
+      '.|..||..|.',
+      '.L--JL--J.',
+      '..........'
+    ]
+    pipe_map = PipeMap.new(lines)
+    pipe_map.follow_start!
+    pipe_map.calculate_inside!
+    pipe_map.print_inside
+  end
+
   def test_point_char
     pipe = Point.new('|', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
     assert_equal false, pipe.blank?

@@ -70,17 +70,54 @@ module PipeMaze
       steps << end_point
       steps
     end
+
+    def calculate_inside!
+      @points.each do |line|
+        if line[0].in_path
+          outside = false
+        else
+          outside = true
+          line[0].outside = true
+        end
+        outside = line[0].in_path ? false : true
+        line[0].outside = !line[0].in_path
+        line.each_cons(2).map do |last_point, current_point|
+          if current_point.in_path
+            outside = !outside unless current_point.connects?(last_point)
+          else
+            current_point.outside = outside
+          end
+        end
+        p '----- end of line'
+        p line[-1]
+      end
+    end
+
+    def print_inside
+      p ''
+      @points.each do |line|
+        output = line.map do |p|
+          if p.in_path
+            p.char
+          else
+            p.outside || p.outside.nil? ? 'O' : 'I'
+          end
+        end
+        puts output.join
+      end
+    end
   end
 
   class Point
     attr_reader :char, :coordinate
-    attr_accessor :in_path, :logical_char
+    attr_accessor :in_path, :logical_char, :outside
 
     def initialize(char, coordinate, max_coordinates)
       @char = char
       @logical_char = char
       @coordinate = coordinate
       @in_path = false
+      @outside = nil
       @zero = max_coordinates[0]
       @max = max_coordinates[1]
     end
