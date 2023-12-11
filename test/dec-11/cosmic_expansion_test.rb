@@ -21,16 +21,9 @@ class CosmicExpansionTest < Minitest::Test
       '.......#..',
       '#...#.....'
     ]
-    galaxy = GalaxyMap.new(lines)
-    assert_equal 12, galaxy.row_count
-    assert_equal 13, galaxy.column_count
-    # these vertical lines were added
-    assert_equal true, galaxy.points[3].all?(&:empty_space?)
-    assert_equal true, galaxy.points[4].all?(&:empty_space?)
-    assert_equal true, galaxy.points[8].all?(&:empty_space?)
-    assert_equal true, galaxy.points[9].all?(&:empty_space?)
-    # columns have been added, which made the galaxies move
-    assert_equal true, galaxy[Coordinate.new(12, 7)].galaxy?
+    galaxy_map = GalaxyMap.new(lines, 2)
+    assert_equal [0, 0, 1, 4, 5, 8, 9, 9, 12], galaxy_map.galaxy_points.map { |p| p.coordinate.x }.sort
+    assert_equal [0, 1, 2, 5, 6, 7, 10, 11, 11], galaxy_map.galaxy_points.map { |p| p.coordinate.y }.sort
   end
 
   def galaxy_pairs_works
@@ -47,8 +40,9 @@ class CosmicExpansionTest < Minitest::Test
       '.......#..',
       '#...#.....'
     ]
-    galaxy = GalaxyMap.new(lines)
-    assert_equal 36, galaxy.galaxy_pairs.length
+    galaxy_map = GalaxyMap.new(lines, 2)
+    assert_equal 36, galaxy_map.galaxy_pairs.length
+    p galaxy_map.galaxy_points
   end
 
   def test_point
