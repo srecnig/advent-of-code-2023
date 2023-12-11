@@ -51,15 +51,6 @@ class CosmicExpansionTest < Minitest::Test
     assert_equal 36, galaxy.galaxy_pairs.length
   end
 
-  # p 'aaaah'
-  # galaxy.points.each do |row|
-  #   p(row.map { |p| "(#{p.coordinate.x}, #{p.coordinate.y})" }.join(' '))
-  # end
-  # p 'bbbbh'
-  # galaxy.points.each do |row|
-  #   p(row.map(&:char).join(' '))
-  # end
-
   def test_point
     point1 = Point.new(Coordinate.new(0, 0), '.')
     assert_equal true, point1.empty_space?

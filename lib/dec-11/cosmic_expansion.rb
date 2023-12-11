@@ -86,12 +86,3 @@ module CosmicExpansion
     end
   end
 end
-
-# @points = Array.new(row_count) { Array.new(column_count) }
-# rows.each_with_index do |row, y_index|
-#   row.each_char.with_index do |char_, x_index|
-#     @points[y_index][x_index] = Point.new(
-#       Coordinate.new(x_index, y_index), char: char_
-#     )
-#   end
-# end
