@@ -21,7 +21,7 @@ class CosmicExpansionTest < Minitest::Test
       '.......#..',
       '#...#.....'
     ]
-    galaxy = Galaxy.new(lines)
+    galaxy = GalaxyMap.new(lines)
     assert_equal 12, galaxy.row_count
     assert_equal 13, galaxy.column_count
     # these vertical lines were added
@@ -31,16 +31,34 @@ class CosmicExpansionTest < Minitest::Test
     assert_equal true, galaxy.points[9].all?(&:empty_space?)
     # columns have been added, which made the galaxies move
     assert_equal true, galaxy[Coordinate.new(12, 7)].galaxy?
-
-    p 'aaaah'
-    galaxy.points.each do |row|
-      p(row.map { |p| "(#{p.coordinate.x}, #{p.coordinate.y})" }.join(' '))
-    end
-    p 'bbbbh'
-    galaxy.points.each do |row|
-      p(row.map(&:char).join(' '))
-    end
   end
+
+  def galaxy_pairs_works
+    lines = [
+      #  |     |
+      '...#......',
+      '.......#..',
+      '#.........',
+      '..........', # - 3
+      '......#...',
+      '.#........',
+      '.........#',
+      '..........', # - 7
+      '.......#..',
+      '#...#.....'
+    ]
+    galaxy = GalaxyMap.new(lines)
+    assert_equal 36, galaxy.galaxy_pairs.length
+  end
+
+  # p 'aaaah'
+  # galaxy.points.each do |row|
+  #   p(row.map { |p| "(#{p.coordinate.x}, #{p.coordinate.y})" }.join(' '))
+  # end
+  # p 'bbbbh'
+  # galaxy.points.each do |row|
+  #   p(row.map(&:char).join(' '))
+  # end
 
   def test_point
     point1 = Point.new(Coordinate.new(0, 0), '.')
@@ -48,5 +66,13 @@ class CosmicExpansionTest < Minitest::Test
 
     point2 = Point.new(Coordinate.new(1, 1), '#')
     assert_equal true, point2.galaxy?
+  end
+
+  def test_point_difference
+    point = Point.new(Coordinate.new(0, 0), '#')
+    assert_equal 6, point.distance(Point.new(Coordinate.new(3, 3), '#'))
+    assert_equal 6, point.distance(Point.new(Coordinate.new(-3, 3), '#'))
+    assert_equal 6, point.distance(Point.new(Coordinate.new(3, -3), '#'))
+    assert_equal 6, point.distance(Point.new(Coordinate.new(-3, -3), '#'))
   end
 end

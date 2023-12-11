@@ -11,10 +11,14 @@ module CosmicExpansion
     def galaxy?
       char == '#'
     end
+
+    def distance(other_point)
+      (coordinate.x - other_point.coordinate.x).abs + (coordinate.y - other_point.coordinate.y).abs
+    end
   end
 
-  class Galaxy
-    attr_reader :points, :row_count, :column_count, :galaxy_points
+  class GalaxyMap
+    attr_reader :points, :row_count, :column_count
 
     def initialize(lines)
       @column_count = lines[0].length
@@ -64,7 +68,7 @@ module CosmicExpansion
 
     def remap!
       # coordinates in points are out of sync with actual coordinates. fix.
-      @galaxy_coordinates = []
+      @galaxy_points = []
       (0...@row_count).each do |y|
         (0...@column_count).each do |x|
           real_coordinate = Coordinate.new(x, y)
@@ -72,9 +76,13 @@ module CosmicExpansion
           # replace with point that for sure has right coordinates + existing char
           new_point = Point.new(real_coordinate, current.char)
           @points[y][x] = new_point
-          @galaxy_coordinates << new_point if new_point.galaxy?
+          @galaxy_points << new_point if new_point.galaxy?
         end
       end
+    end
+
+    def galaxy_pairs
+      @galaxy_points.combination(2)
     end
   end
 end
