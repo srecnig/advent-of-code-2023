@@ -34,8 +34,12 @@ module PipeMaze
       potentially_connected_points = @start.connects_to.map { |c| self[c] }
       connected_points = potentially_connected_points.select { |p| p.connects?(@start) }
       @path = explore_route(start_point: connected_points[0], end_point: @start)
-      @path.each { |point| point.in_path = true }
+      @path.each do |point|
+        point.in_path = true
+        point.outside = false
+      end
 
+      # set start to the proper logical_char
       case connected_points.map(&:coordinate)
       when [@start.north, @start.south]
         @start.logical_char = '|'
@@ -72,25 +76,38 @@ module PipeMaze
     end
 
     def calculate_inside!
-      @points.each do |line|
-        if line[0].in_path
-          outside = false
-        else
-          outside = true
-          line[0].outside = true
-        end
-        outside = line[0].in_path ? false : true
-        line[0].outside = !line[0].in_path
-        line.each_cons(2).map do |last_point, current_point|
-          if current_point.in_path
-            outside = !outside unless current_point.connects?(last_point)
-          else
-            current_point.outside = outside
+      p 'aaah' * 6
+      @points.each.with_index do |row, i|
+        debug = true if i == 2
+        # if outside is not set at the beginning of a line, it must be outside
+        row[0].outside = true if row[0].outside.nil?
+
+        row.each_cons(2).map do |last_point, current_point|
+          # we flip, because we go from outside to inside
+          current_point.flips_inside_out = true if last_point.outside && current_point.outside == false
+          # we flip, because we go from inside to outside
+          last_point.flips_inside_out = true if last_point.outside == false && current_point.outside.nil?
+          # lastly, if we have non connected path points, both are flippers
+          if last_point.outside == false && current_point.outside == false && !current_point.connects?(last_point)
+            last_point.flips_inside_out = true
+            current_point.flips_inside_out = true
           end
         end
-        p '----- end of line'
-        p line[-1]
+        p row if debug
       end
+
+      # we now the flippers for every line. so for every line, go by point and set
+      @points.each do |row|
+        outside = row[0].outside
+        row.each do |point|
+          outside = !outside if point.flips_inside_out
+          point.outside = outside if point.outside.nil?
+        end
+      end
+    end
+
+    def inside_points
+      @points.flatten.select { |p| !p.outside && !p.in_path }
     end
 
     def print_inside
@@ -99,8 +116,12 @@ module PipeMaze
         output = line.map do |p|
           if p.in_path
             p.char
+          elsif p.outside.nil?
+            'N'
+          elsif p.outside
+            'O'
           else
-            p.outside || p.outside.nil? ? 'O' : 'I'
+            'I'
           end
         end
         puts output.join
@@ -110,7 +131,7 @@ module PipeMaze
 
   class Point
     attr_reader :char, :coordinate
-    attr_accessor :in_path, :logical_char, :outside
+    attr_accessor :in_path, :logical_char, :outside, :flips_inside_out
 
     def initialize(char, coordinate, max_coordinates)
       @char = char
@@ -118,6 +139,7 @@ module PipeMaze
       @coordinate = coordinate
       @in_path = false
       @outside = nil
+      @flips_inside_out = nil
       @zero = max_coordinates[0]
       @max = max_coordinates[1]
     end

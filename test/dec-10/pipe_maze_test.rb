@@ -80,7 +80,11 @@ class PipeMazeTest < Minitest::Test
     pipe_map = PipeMap.new(lines)
     pipe_map.follow_start!
     pipe_map.calculate_inside!
-    pipe_map.print_inside
+    assert_equal true, pipe_map.inside_points.map(&:coordinate).include?(Coordinate.new(2, 6))
+    assert_equal true, pipe_map.inside_points.map(&:coordinate).include?(Coordinate.new(3, 6))
+    assert_equal true, pipe_map.inside_points.map(&:coordinate).include?(Coordinate.new(6, 6))
+    assert_equal true, pipe_map.inside_points.map(&:coordinate).include?(Coordinate.new(7, 6))
+    assert_equal 4, pipe_map.inside_points.length
   end
 
   def test_point_char
