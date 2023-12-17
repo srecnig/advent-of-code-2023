@@ -34,22 +34,28 @@ class LavaFloorTest < Minitest::Test
 
   def test_pass_through
     point = Point.new(Coordinate.new(5, 5), '.')
-    assert_equal [Coordinate.new(5, 6)], point.pass_through(:north)
-    assert_equal [Coordinate.new(4, 5)], point.pass_through(:east)
-    assert_equal [Coordinate.new(5, 4)], point.pass_through(:south)
-    assert_equal [Coordinate.new(6, 5)], point.pass_through(:west)
+    assert_equal [Beam.new(Coordinate.new(5, 6), :north)], point.pass_through(:north)
+    assert_equal [Beam.new(Coordinate.new(4, 5), :east)], point.pass_through(:east)
+    assert_equal [Beam.new(Coordinate.new(5, 4), :south)], point.pass_through(:south)
+    assert_equal [Beam.new(Coordinate.new(6, 5), :west)], point.pass_through(:west)
 
     point = Point.new(Coordinate.new(5, 5), '/')
-    assert_equal [Coordinate.new(4, 5)], point.pass_through(:north)
-    assert_equal [Coordinate.new(5, 6)], point.pass_through(:east)
-    assert_equal [Coordinate.new(6, 5)], point.pass_through(:south)
-    assert_equal [Coordinate.new(5, 4)], point.pass_through(:west)
+    assert_equal [Beam.new(Coordinate.new(4, 5), :east)], point.pass_through(:north)
+    assert_equal [Beam.new(Coordinate.new(5, 6), :north)], point.pass_through(:east)
+    assert_equal [Beam.new(Coordinate.new(6, 5), :west)], point.pass_through(:south)
+    assert_equal [Beam.new(Coordinate.new(5, 4), :south)], point.pass_through(:west)
 
     point = Point.new(Coordinate.new(5, 5), '|')
-    assert_equal [Coordinate.new(5, 6)], point.pass_through(:north)
-    assert_equal [Coordinate.new(5, 4), Coordinate.new(5, 6)], point.pass_through(:east)
-    assert_equal [Coordinate.new(5, 4)], point.pass_through(:south)
-    assert_equal [Coordinate.new(5, 4), Coordinate.new(5, 6)], point.pass_through(:west)
+    assert_equal [Beam.new(Coordinate.new(5, 6), :north)], point.pass_through(:north)
+    assert_equal [
+      Beam.new(Coordinate.new(5, 4), :south),
+      Beam.new(Coordinate.new(5, 6), :north)
+    ], point.pass_through(:east)
+    assert_equal [Beam.new(Coordinate.new(5, 4), :south)], point.pass_through(:south)
+    assert_equal [
+      Beam.new(Coordinate.new(5, 4), :south),
+      Beam.new(Coordinate.new(5, 6), :north)
+    ], point.pass_through(:west)
   end
 
   def test_splitter

@@ -2,12 +2,16 @@
 
 module LavaFloor
   class Contraption
+    attr_reader :beams
+
     def initialize(lines)
       column_count = lines[0].length
       row_count = lines.length
       @zero = Coordinate.new(0, 0)
       @max = Coordinate.new(column_count - 1, row_count - 1)
       @points = Array.new(row_count) { Array.new(column_count) }
+      @beams = []
+
       lines.each_with_index do |row, y_index|
         row.each_char.with_index do |char, x_index|
           new_point = Point.new(
@@ -22,10 +26,27 @@ module LavaFloor
       @points[coordinate.y][coordinate.x]
     end
 
+    def send_beam!(beam)
+      @beams << beam
+      next_beams = self[beam.coordinate].pass_through(beam.direction).select do |beam_|
+        in_bounds?(beam_.coordinate) && !in_loop?(beam_)
+      end
+
+      next_beams.each do |beam_|
+        send_beam!(beam_)
+      end
+    end
+
     def in_bounds?(coordinate)
       coordinate.x <= @max.x && coordinate.y <= @max.y && coordinate.x >= @zero.x && coordinate.y >= @zero.y
     end
+
+    def in_loop?(beam)
+      @beams.any?(beam)
+    end
   end
+
+  Beam = Struct.new(:coordinate, :direction)
 
   Coordinate = Struct.new(:x, :y)
 
@@ -35,13 +56,13 @@ module LavaFloor
       directions.map do |direction|
         case direction
         when :north
-          Coordinate.new(coordinate.x, coordinate.y - 1)
+          Beam.new(Coordinate.new(coordinate.x, coordinate.y - 1), :south)
         when :east
-          Coordinate.new(coordinate.x + 1, coordinate.y)
+          Beam.new(Coordinate.new(coordinate.x + 1, coordinate.y), :west)
         when :south
-          Coordinate.new(coordinate.x, coordinate.y + 1)
+          Beam.new(Coordinate.new(coordinate.x, coordinate.y + 1), :north)
         when :west
-          Coordinate.new(coordinate.x - 1, coordinate.y)
+          Beam.new(Coordinate.new(coordinate.x - 1, coordinate.y), :east)
         end
       end
     end
