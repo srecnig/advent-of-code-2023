@@ -9,10 +9,4 @@ def main1(filepath)
   p contraption.beams.map(&:coordinate).uniq.length
 end
 
-def main2(filepath)
-  something = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
-  p something
-end
-
 main1('input.txt')
-# main2('input1.txt')
