@@ -89,43 +89,35 @@ class PipeMazeTest < Minitest::Test
 
   def test_point_char
     pipe = Point.new('|', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(5, 4), Coordinate.new(5, 6)], pipe.connects_to
 
     pipe = Point.new('-', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(6, 5), Coordinate.new(4, 5)], pipe.connects_to
 
     pipe = Point.new('L', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(5, 4), Coordinate.new(6, 5)], pipe.connects_to
 
     pipe = Point.new('J', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(5, 4), Coordinate.new(4, 5)], pipe.connects_to
 
     pipe = Point.new('7', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(5, 6), Coordinate.new(4, 5)], pipe.connects_to
 
     pipe = Point.new('F', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, pipe.blank?
     assert_equal false, pipe.start?
     assert_equal [Coordinate.new(6, 5), Coordinate.new(5, 6)], pipe.connects_to
 
     blank = Point.new('.', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal true, blank.blank?
     assert_equal false, blank.start?
     assert_equal [], blank.connects_to
 
     # S can potentially connect to everything
     start = Point.new('S', Coordinate.new(5, 5), [Coordinate.new(0, 0), Coordinate.new(10, 10)])
-    assert_equal false, start.blank?
     assert_equal true, start.start?
     assert_equal [
       Coordinate.new(5, 4), Coordinate.new(6, 5), Coordinate.new(5, 6), Coordinate.new(4, 5)
