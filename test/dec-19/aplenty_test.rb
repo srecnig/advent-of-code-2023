@@ -43,7 +43,7 @@ class AplentyTest < Minitest::Test
   def test_can_apply_rule
     rule = Rule.new('s<537', 'gd')
     assert_equal 'gd', rule.apply_rule(Part.new(12, 23, 42, 50))
-    assert_equal false, rule.apply_rule(Part.new(12, 1, 2331, 50))
+    assert_equal false, rule.apply_rule(Part.new(12, 1, 2331, 580))
     rule = Rule.new(nil, 'A')
     assert_equal 'A', rule.apply_rule(Part.new(12, 23, 42, 50))
   end
