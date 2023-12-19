@@ -12,4 +12,4 @@ def main1(filepath)
   p pipe_map.inside_points.length
 end
 
-main1('input3.txt')
+main1('input.txt')

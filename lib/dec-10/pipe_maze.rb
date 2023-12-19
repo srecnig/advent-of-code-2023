@@ -77,7 +77,7 @@ module PipeMaze
 
     def calculate_inside!
       @points.each do |row|
-        edges = row.select(&:edge?)
+        edges = row.select { |p| p.in_path && p.edge? }
         normalized_edges = edges.each.with_index.with_object([]) do |(edge, i), arr|
           next_edge = edges[i + 1]
 
