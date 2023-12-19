@@ -77,7 +77,7 @@ module PipeMaze
 
     def calculate_inside!
       @points.each do |row|
-        edges = row.select { |p| p.in_path && p.edge? }
+        edges = row.select(&:edge?)
         normalized_edges = edges.each.with_index.with_object([]) do |(edge, i), arr|
           next_edge = edges[i + 1]
 
@@ -121,7 +121,7 @@ module PipeMaze
 
   class Point
     attr_reader :char, :coordinate
-    attr_accessor :in_path, :logical_char, :outside, :flips_inside_out
+    attr_accessor :in_path, :logical_char, :outside
 
     def initialize(char, coordinate, max_coordinates)
       @char = char
@@ -129,7 +129,6 @@ module PipeMaze
       @coordinate = coordinate
       @in_path = false
       @outside = nil
-      @flips_inside_out = nil
       @zero = max_coordinates[0]
       @max = max_coordinates[1]
     end
@@ -174,15 +173,11 @@ module PipeMaze
     end
 
     def edge?
-      ['|', 'L', 'J', '7', 'F'].include?(@logical_char)
+      @in_path && ['|', 'L', 'J', '7', 'F'].include?(@logical_char)
     end
 
     def connects?(point)
       connects_to.include?(point.coordinate)
-    end
-
-    def blank?
-      @char == '.'
     end
 
     def start?
@@ -190,40 +185,3 @@ module PipeMaze
     end
   end
 end
-
-# kante is im path.
-# ausnahme, der davor war auch eine kante
-
-# O|II|O|II|O
-#     1 2  3  -> I
-
-# def calculate_inside!
-#   p 'aaah' * 6
-#   @points.each.with_index do |row, i|
-#     debug = true if i == 2
-#     # if outside is not set at the beginning of a line, it must be outside
-#     row[0].outside = true if row[0].outside.nil?
-
-#     row.each_cons(2).map do |last_point, current_point|
-#       # we flip, because we go from outside to inside
-#       current_point.flips_inside_out = true if last_point.outside && current_point.outside == false
-#       # we flip, because we go from inside to outside
-#       last_point.flips_inside_out = true if last_point.outside == false && current_point.outside.nil?
-#       # lastly, if we have non connected path points, both are flippers
-#       if last_point.outside == false && current_point.outside == false && !current_point.connects?(last_point)
-#         last_point.flips_inside_out = true
-#         current_point.flips_inside_out = true
-#       end
-#     end
-#     p row if debug
-#   end
-
-#   # we now the flippers for every line. so for every line, go by point and set
-#   @points.each do |row|
-#     outside = row[0].outside
-#     row.each do |point|
-#       outside = !outside if point.flips_inside_out
-#       point.outside = outside if point.outside.nil?
-#     end
-#   end
-# end
