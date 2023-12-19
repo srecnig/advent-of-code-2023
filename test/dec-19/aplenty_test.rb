@@ -39,4 +39,17 @@ class AplentyTest < Minitest::Test
     assert_equal Part.new(1679, 44, 2067, 496), workflow_map.parts[1]
     assert_equal Part.new(2036, 264, 79, 2244), workflow_map.parts[2]
   end
+
+  def test_can_apply_rule
+    rule = Rule.new('s<537', 'gd')
+    assert_equal 'gd', rule.apply_rule(Part.new(12, 23, 42, 50))
+    assert_equal false, rule.apply_rule(Part.new(12, 1, 2331, 50))
+    rule = Rule.new(nil, 'A')
+    assert_equal 'A', rule.apply_rule(Part.new(12, 23, 42, 50))
+  end
+
+  def test_can_have_sum_of_part
+    p = Part.new(1, 2, 3, 500)
+    assert_equal 506, p.sum
+  end
 end

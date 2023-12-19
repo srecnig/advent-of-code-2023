@@ -1,9 +1,31 @@
 # frozen_string_literal: true
 
 module Aplenty
-  Part = Struct.new(:x, :m, :s, :a)
+  Part = Struct.new(:x, :m, :a, :s, :status) do
+    def sum
+      x + m + s + a
+    end
+  end
 
-  Rule = Struct.new(:condition, :destination)
+  Rule = Struct.new(:condition, :destination) do
+    def apply_rule(part)
+      if condition&.include?('<')
+        comparator = :<
+        (prop, value) = condition.split('<').map(&:strip)
+      elsif condition&.include?('>')
+        comparator = :>
+        (prop, value) = condition.split('>').map(&:strip)
+      else
+        return destination
+      end
+
+      if part.send(prop).send(comparator, value.to_i)
+        destination
+      else
+        false
+      end
+    end
+  end
 
   class WorkflowMap
     attr_reader :parts
@@ -22,6 +44,25 @@ module Aplenty
     def [](key)
       @workflows[key]
     end
+
+    def process_parts!
+      @parts.each do |part|
+        workflow = 'in'
+        loop do
+          next_step = self[workflow].apply_workflow(part)
+          if next_step == 'A'
+            part.status = :accepted
+            break
+          elsif next_step == 'R'
+            part.status = :rejected
+            break
+          else
+            workflow = next_step
+            next
+          end
+        end
+      end
+    end
   end
 
   class Workflow
@@ -36,6 +77,13 @@ module Aplenty
         else
           Rule.new(nil, rulestr)
         end
+      end
+    end
+
+    def apply_workflow(part)
+      @rules.each do |rule|
+        evaluated = rule.apply_rule(part)
+        return evaluated unless evaluated == false
       end
     end
   end
