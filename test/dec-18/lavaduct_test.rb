@@ -52,5 +52,6 @@ class LavaductTest < Minitest::Test
     manual = DiggingManual.new(lines)
     manual.dig!
     manual.print
+    assert_equal 62, manual.diggings
   end
 end
