@@ -10,9 +10,4 @@ def main1(filepath)
   p manual.diggings
 end
 
-def main2(filepath)
-  something = File.readlines(File.join(File.dirname(__FILE__), filepath), chomp: true)
-  p something
-end
-
 main1('input.txt')
